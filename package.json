@@ -1,0 +1,57 @@
+{
+  "name": "babel-plugin-react-component-data-attribute",
+  "description": "Babel plugin to add a data attribute containing its component’s name to the top-level DOM node",
+  "version": "0.1.0",
+  "main": "lib/index.js",
+  "author": "Chris Sauve <chrismsauve@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "test": "jest",
+    "test:watch": "yarn run test -- --watch",
+    "check": "yarn run lint && yarn run test",
+    "build": "babel src --out-dir lib",
+    "prepublish": "in-publish && yarn run build || :"
+  },
+  "files": [
+    "README.md",
+    "index.js",
+    "lib"
+  ],
+  "eslintConfig": {
+    "extends": [
+      "plugin:shopify/node",
+      "plugin:shopify/esnext"
+    ],
+    "rules": {
+      "prefer-destructuring": "off"
+    }
+  },
+  "babel": {
+    "presets": [
+      [
+        "shopify/node",
+        {
+          "version": "6.0.0"
+        }
+      ]
+    ]
+  },
+  "jest": {
+    "testRegex": "[\\w+]\\.test\\.js$",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    }
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-jest": "^20.0.3",
+    "babel-preset-shopify": "^16.0.2",
+    "eslint": "^3.19.0",
+    "eslint-plugin-shopify": "^16.0.1",
+    "in-publish": "^2.0.0",
+    "jest": "^20.0.4"
+  },
+  "dependencies": {}
+}

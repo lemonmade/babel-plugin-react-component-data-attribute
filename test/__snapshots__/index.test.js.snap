@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`babelPluginReactComponentDataAttribute() arrow expressions handles non-block statement arrow expressions 1`] = `"const MyComponent = () => <div data-component=\\"MyComponent\\" />;"`;
+
+exports[`babelPluginReactComponentDataAttribute() does not add attributes to composite components 1`] = `
+"function MyComponent() {
+  return <SomeOtherComponent />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() handles conditional returns 1`] = `
+"function MyComponent() {
+  return true ? <div data-component=\\"MyComponent\\" /> : <span data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() handles conditional returns 2`] = `
+"function MyComponent() {
+  if (true) {
+    return <div data-component=\\"MyComponent\\" />;
+  } else {
+    return <span data-component=\\"MyComponent\\" />;
+  }
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() handles simple returns 1`] = `
+"function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the file’s basename when it is not unknown and is not an index file 1`] = `
+"export default class extends React.Component {
+  render() {
+    return <div data-component=\\"MyComponent\\" />;
+  }
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the file’s basename when it is not unknown and is not an index file 2`] = `
+"export default function () {
+  return <div data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the file’s basename when it is not unknown and is not an index file 3`] = `
+"export default (() => {
+  return <div data-component=\\"MyComponent\\" />;
+});"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the file’s directory name when it is an index file 1`] = `
+"export default class extends React.Component {
+  render() {
+    return <div data-component=\\"MyComponent\\" />;
+  }
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the file’s directory name when it is an index file 2`] = `
+"export default function () {
+  return <div data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the file’s directory name when it is an index file 3`] = `
+"export default (() => {
+  return <div data-component=\\"MyComponent\\" />;
+});"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the variable name when no name exists 1`] = `
+"const MyComponent = class extends React.Component {
+  render() {
+    return <div data-component=\\"MyComponent\\" />;
+  }
+};"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() name uses the variable name when no name exists 2`] = `
+"const MyComponent = function () {
+  return <div data-component=\\"MyComponent\\" />;
+};"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the top-level node 1`] = `
+"function MyComponent() {
+  return <div data-component=\\"MyComponent\\"><div /></div>;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the top-level node 2`] = `
+"function MyComponent() {
+  return <SomeOtherComponent><div /></SomeOtherComponent>;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the top-level node 3`] = `
+"function MyComponent() {
+  return <SomeOtherComponent>{() => <div />}</SomeOtherComponent>;
+}"
+`;
