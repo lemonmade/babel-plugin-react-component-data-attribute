@@ -2,6 +2,12 @@
 
 exports[`babelPluginReactComponentDataAttribute() arrow expressions handles non-block statement arrow expressions 1`] = `"const MyComponent = () => <div data-component=\\"MyComponent\\" />;"`;
 
+exports[`babelPluginReactComponentDataAttribute() does not add attributes from a parent function 1`] = `
+"function MyComponent() {
+  return () => <div />;
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() does not add attributes to composite components 1`] = `
 "function MyComponent() {
   return <SomeOtherComponent />;

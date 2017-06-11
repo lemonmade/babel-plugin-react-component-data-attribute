@@ -29,9 +29,12 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
   }
 
   const returnStatementVisitor = {
-    JSXElement(path, {name}) {
+    JSXElement(path, {name, source}) {
       // We never want to go into a tree of JSX elements, only ever process the top-level item
       path.skip();
+
+      // Bail early if we are in a different function than the component
+      if (path.getFunctionParent() !== source) { return; }
 
       const openingElement = path.get('openingElement');
       const {node} = openingElement;
@@ -42,8 +45,8 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
   };
 
   const renderMethodVisitor = {
-    ReturnStatement(path, {name}) {
-      path.traverse(returnStatementVisitor, {name});
+    ReturnStatement(path, {name, source}) {
+      path.traverse(returnStatementVisitor, {name, source});
     },
   };
 
@@ -58,7 +61,7 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
           .get('body.body')
           .filter((bodyPath) => bodyPath.isClassMethod() && bodyPath.get('key').isIdentifier({name: 'render'}))
           .forEach((renderPath) => {
-            renderPath.traverse(renderMethodVisitor, {name});
+            renderPath.traverse(renderMethodVisitor, {name, source: renderPath});
           });
       },
       'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression': (path, state) => {
@@ -66,9 +69,9 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
         if (name == null) { return; }
 
         if (path.isArrowFunctionExpression() && !path.get('body').isBlockStatement()) {
-          path.traverse(returnStatementVisitor, {name});
+          path.traverse(returnStatementVisitor, {name, source: path});
         } else {
-          path.traverse(renderMethodVisitor, {name});
+          path.traverse(renderMethodVisitor, {name, source: path});
         }
       },
     },

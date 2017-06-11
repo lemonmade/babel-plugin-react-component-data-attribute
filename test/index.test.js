@@ -65,6 +65,14 @@ describe('babelPluginReactComponentDataAttribute()', () => {
     `)).toMatchSnapshot();
   });
 
+  it('does not add attributes from a parent function', () => {
+    expect(transform(`
+      function MyComponent() {
+        return () => <div />;
+      }
+    `)).toMatchSnapshot();
+  });
+
   describe('name', () => {
     it('uses the variable name when no name exists', () => {
       expect(transform(`
