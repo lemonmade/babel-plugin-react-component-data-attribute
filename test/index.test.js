@@ -204,7 +204,41 @@ describe('babelPluginReactComponentDataAttribute()', () => {
   });
 
   describe('options', () => {
-    // describe('')
+    describe('onlyRootComponents', () => {
+      it('adds attributes to components that are "root" ones', () => {
+        expect(transform(`
+          export default function MyComponent() {
+            return <div />;
+          }
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/index.js')})).toMatchSnapshot();
+
+        expect(transform(`
+          export default function SomeComponent() {
+            return <div />;
+          }
+        `, {}, {filename: resolve('MyComponent/MyComponent.js')})).toMatchSnapshot();
+
+        expect(transform(`
+          export function MyComponent() {
+            return <div />;
+          }
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/MyComponent.js')})).toMatchSnapshot();
+      });
+
+      it('does not add data attributes to other components', () => {
+        expect(transform(`
+          function SomeComponent() {
+            return <div />;
+          }
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/index.js')})).toMatchSnapshot();
+
+        expect(transform(`
+          export default function SomeComponent() {
+            return <div />;
+          }
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/SomethingElse.js')})).toMatchSnapshot();
+      });
+    });
   });
 });
 

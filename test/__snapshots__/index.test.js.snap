@@ -131,6 +131,36 @@ exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the
 }"
 `;
 
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 1`] = `
+"export default function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 2`] = `
+"export default function SomeComponent() {
+  return <div data-component=\\"SomeComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 3`] = `
+"export function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents does not add data attributes to other components 1`] = `
+"function SomeComponent() {
+  return <div />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents does not add data attributes to other components 2`] = `
+"export default function SomeComponent() {
+  return <div />;
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() updates intermediate assignments as appropriate 1`] = `
 "function MyComponent() {
   const markup = <div data-component=\\"MyComponent\\" />;

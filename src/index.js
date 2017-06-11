@@ -12,8 +12,27 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     return t.objectProperty(t.stringLiteral(DATA_ATTRIBUTE), t.stringLiteral(name));
   }
 
+  function fileDetails({opts: {filename}}) {
+    if (filename === 'unknown' || filename == null) { return null; }
+    return {
+      directory: basename(dirname(filename)),
+      name: basename(filename, extname(filename)),
+    };
+  }
+
+  function shouldProcessPossibleComponent(path, state) {
+    const {onlyRootComponents = false} = state.opts || {};
+    if (!onlyRootComponents) { return true; }
+
+    const details = fileDetails(state.file);
+    if (details == null) { return false; }
+    if (details.name !== 'index' && details.name !== details.directory) { return false; }
+
+    const statementParent = path.getStatementParent();
+    return statementParent.isExportDefaultDeclaration() || statementParent.isExportNamedDeclaration();
+  }
+
   function nameForReactComponent(path, file) {
-    const {opts: {filename}} = file;
     const {parentPath, node: {id}} = path;
 
     if (t.isIdentifier(id)) {
@@ -24,12 +43,12 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
       return parentPath.node.id.name;
     }
 
-    if (filename === 'unknown') { return null; }
+    const details = fileDetails(file);
+    if (details == null) { return details; }
 
-    const componentFileName = basename(filename, extname(filename));
-    return componentFileName === 'index'
-      ? basename(dirname(filename))
-      : componentFileName;
+    return details.name === 'index'
+      ? details.directory
+      : details.name;
   }
 
   const returnStatementVisitor = {
@@ -84,6 +103,8 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     name: 'babel-plugin-react-component-data-attribute',
     visitor: {
       'ClassDeclaration|ClassExpression': (path, state) => {
+        if (!shouldProcessPossibleComponent(path, state)) { return; }
+
         const name = nameForReactComponent(path, state.file);
         if (name == null) { return; }
 
@@ -95,6 +116,8 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
           });
       },
       'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression': (path, state) => {
+        if (!shouldProcessPossibleComponent(path, state)) { return; }
+
         const name = nameForReactComponent(path, state.file);
         if (name == null) { return; }
 
