@@ -17,6 +17,14 @@ exports[`babelPluginReactComponentDataAttribute() adds the property to React.cre
 
 exports[`babelPluginReactComponentDataAttribute() arrow expressions handles non-block statement arrow expressions 1`] = `"const MyComponent = () => <div data-component=\\"MyComponent\\" />;"`;
 
+exports[`babelPluginReactComponentDataAttribute() classes only adds attributes to render methods 1`] = `
+"class MyComponent extends React.Component {
+  renderAnotherThing() {
+    return <div />;
+  }
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() does not add attributes from a parent function 1`] = `
 "function MyComponent() {
   return () => <div />;

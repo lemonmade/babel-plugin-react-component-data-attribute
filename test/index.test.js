@@ -161,6 +161,18 @@ describe('babelPluginReactComponentDataAttribute()', () => {
     });
   });
 
+  describe('classes', () => {
+    it('only adds attributes to render methods', () => {
+      expect(transform(`
+        class MyComponent extends React.Component {
+          renderAnotherThing() {
+            return <div />;
+          }
+        }
+      `)).toMatchSnapshot();
+    });
+  });
+
   describe('options', () => {
     // describe('')
   });
