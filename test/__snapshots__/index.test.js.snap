@@ -130,3 +130,33 @@ exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the
   return <SomeOtherComponent>{() => <div />}</SomeOtherComponent>;
 }"
 `;
+
+exports[`babelPluginReactComponentDataAttribute() updates intermediate assignments as appropriate 1`] = `
+"function MyComponent() {
+  const markup = <div data-component=\\"MyComponent\\" />;
+  return markup;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() updates intermediate assignments as appropriate 2`] = `
+"function MyComponent() {
+  const markup = <SomeOtherComponent />;
+  return markup;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() updates intermediate assignments as appropriate 3`] = `
+"function MyComponent() {
+  const markup = null;
+  return markup;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() updates intermediate assignments as appropriate 4`] = `
+"function MyComponent() {
+  const markup = React.createElement('div', {
+    'data-component': 'MyComponent'
+  });
+  return markup;
+}"
+`;

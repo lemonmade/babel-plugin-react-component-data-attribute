@@ -68,7 +68,15 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
 
   const renderMethodVisitor = {
     ReturnStatement(path, {name, source}) {
-      path.traverse(returnStatementVisitor, {name, source});
+      const arg = path.get('argument');
+
+      if (arg.isIdentifier()) {
+        const binding = path.scope.getBinding(arg.node.name);
+        if (binding == null) { return; }
+        binding.path.traverse(returnStatementVisitor, {name, source});
+      } else {
+        path.traverse(returnStatementVisitor, {name, source});
+      }
     },
   };
 

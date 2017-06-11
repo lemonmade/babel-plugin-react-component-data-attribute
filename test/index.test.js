@@ -87,6 +87,36 @@ describe('babelPluginReactComponentDataAttribute()', () => {
     `)).toMatchSnapshot();
   });
 
+  it('updates intermediate assignments as appropriate', () => {
+    expect(transform(`
+      function MyComponent() {
+        const markup = <div />;
+        return markup;
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {
+        const markup = <SomeOtherComponent />;
+        return markup;
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {
+        const markup = null;
+        return markup;
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {
+        const markup = React.createElement('div', {});
+        return markup;
+      }
+    `)).toMatchSnapshot();
+  });
+
   describe('name', () => {
     it('uses the variable name when no name exists', () => {
       expect(transform(`
