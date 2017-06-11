@@ -1,5 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`babelPluginReactComponentDataAttribute() adds the property to React.createElement calls 1`] = `
+"function MyComponent() {
+  return React.createElement(someElement, { foo: 'bar', 'data-component': 'MyComponent'
+  });
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() adds the property to React.createElement calls 2`] = `
+"function MyComponent() {
+  return React.createElement(someElement, {
+    \\"data-component\\": \\"MyComponent\\"
+  });
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() arrow expressions handles non-block statement arrow expressions 1`] = `"const MyComponent = () => <div data-component=\\"MyComponent\\" />;"`;
 
 exports[`babelPluginReactComponentDataAttribute() does not add attributes from a parent function 1`] = `

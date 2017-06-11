@@ -73,6 +73,20 @@ describe('babelPluginReactComponentDataAttribute()', () => {
     `)).toMatchSnapshot();
   });
 
+  it('adds the property to React.createElement calls', () => {
+    expect(transform(`
+      function MyComponent() {
+        return React.createElement(someElement, {foo: 'bar'});
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {
+        return React.createElement(someElement);
+      }
+    `)).toMatchSnapshot();
+  });
+
   describe('name', () => {
     it('uses the variable name when no name exists', () => {
       expect(transform(`
@@ -145,6 +159,10 @@ describe('babelPluginReactComponentDataAttribute()', () => {
         const MyComponent = () => <div />;
       `)).toMatchSnapshot();
     });
+  });
+
+  describe('options', () => {
+    // describe('')
   });
 });
 

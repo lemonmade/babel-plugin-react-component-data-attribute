@@ -8,6 +8,10 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     return t.jSXAttribute(t.jSXIdentifier(DATA_ATTRIBUTE), t.stringLiteral(name));
   }
 
+  function createObjectProperty(name) {
+    return t.objectProperty(t.stringLiteral(DATA_ATTRIBUTE), t.stringLiteral(name));
+  }
+
   function nameForReactComponent(path, file) {
     const {opts: {filename}} = file;
     const {parentPath, node: {id}} = path;
@@ -41,6 +45,24 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
       if (!t.isJSXIdentifier(node.name) || !BUILTIN_COMPONENT_REGEX.test(node.name.name)) { return; }
 
       node.attributes.push(createAttribute(name));
+    },
+    CallExpression(path, {name, source}) {
+      // Bail early if we are in a different function than the component
+      if (path.getFunctionParent() !== source) { return; }
+      if (!path.get('callee').isMemberExpression()) { return; }
+      if (!path.get('callee.object').isIdentifier({name: 'React'})) { return; }
+      if (!path.get('callee.property').isIdentifier({name: 'createElement'})) { return; }
+
+      const {arguments: args} = path.node;
+      if (args.length === 1) {
+        args.push(t.objectExpression([createObjectProperty(name)]));
+        return;
+      }
+
+      const secondArgument = path.get('arguments.1');
+      if (!secondArgument.isObjectExpression()) { return; }
+
+      secondArgument.node.properties.push(createObjectProperty(name));
     },
   };
 
