@@ -18,7 +18,7 @@ describe('babelPluginReactComponentDataAttribute()', () => {
       }
     `)).toMatchSnapshot();
   });
-  
+
   it('handles conditional returns', () => {
     expect(transform(`
       function MyComponent() {
