@@ -21,6 +21,9 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
   }
 
   function shouldProcessPossibleComponent(path, state) {
+    if (!path.getFunctionParent().isProgram()) { return false; }
+    if (path.parentPath.isAssignmentExpression()) { return false; }
+
     const {onlyRootComponents = false} = state.opts || {};
     if (!onlyRootComponents) { return true; }
 
@@ -63,6 +66,11 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
       const {node} = openingElement;
       if (!t.isJSXIdentifier(node.name) || !BUILTIN_COMPONENT_REGEX.test(node.name.name)) { return; }
 
+      const hasDataAttribute = node.attributes.some((attribute) => (
+        t.isJSXIdentifier(attribute.name, {name: DATA_ATTRIBUTE})
+      ));
+      if (hasDataAttribute) { return; }
+
       node.attributes.push(createAttribute(name));
     },
     CallExpression(path, {name, source}) {
@@ -80,6 +88,11 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
 
       const secondArgument = path.get('arguments.1');
       if (!secondArgument.isObjectExpression()) { return; }
+
+      const hasDataAttribute = secondArgument.node.properties.some((property) => (
+        t.isStringLiteral(property.key, {value: DATA_ATTRIBUTE})
+      ));
+      if (hasDataAttribute) { return; }
 
       secondArgument.node.properties.push(createObjectProperty(name));
     },

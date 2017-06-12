@@ -117,6 +117,38 @@ describe('babelPluginReactComponentDataAttribute()', () => {
     `)).toMatchSnapshot();
   });
 
+  it('only processes top-level components', () => {
+    expect(transform(`
+      if (true) {
+        function MyComponent() {
+          return <div />;
+        }
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {}
+
+      MyComponent.prototype.render = function render() {
+        return <div />;
+      }
+    `)).toMatchSnapshot();
+  });
+
+  it('does not process nodes that already have the data attribute', () => {
+    expect(transform(`
+      function MyComponent() {
+        return <div data-component="MyComponent" />;
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {
+        return React.createElement('div', {'data-component': 'MyComponent'});
+      }
+    `)).toMatchSnapshot();
+  });
+
   describe('name', () => {
     it('uses the variable name when no name exists', () => {
       expect(transform(`

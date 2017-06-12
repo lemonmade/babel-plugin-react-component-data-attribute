@@ -37,6 +37,18 @@ exports[`babelPluginReactComponentDataAttribute() does not add attributes to com
 }"
 `;
 
+exports[`babelPluginReactComponentDataAttribute() does not process nodes that already have the data attribute 1`] = `
+"function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() does not process nodes that already have the data attribute 2`] = `
+"function MyComponent() {
+  return React.createElement('div', { 'data-component': 'MyComponent' });
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() handles conditional returns 1`] = `
 "function MyComponent() {
   return true ? <div data-component=\\"MyComponent\\" /> : <span data-component=\\"MyComponent\\" />;
@@ -129,6 +141,22 @@ exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the
 "function MyComponent() {
   return <SomeOtherComponent>{() => <div />}</SomeOtherComponent>;
 }"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() only processes top-level components 1`] = `
+"if (true) {
+  function MyComponent() {
+    return <div data-component=\\"MyComponent\\" />;
+  }
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() only processes top-level components 2`] = `
+"function MyComponent() {}
+
+MyComponent.prototype.render = function render() {
+  return <div />;
+};"
 `;
 
 exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 1`] = `
