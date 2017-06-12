@@ -42,7 +42,7 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
   function evaluatePotentialComponent(path, state) {
     const name = nameForReactComponent(path, state.file);
     const overrides = name && getoverrides(name, state.opts.overrides);
-    
+
     let process;
 
     if (overrides != null && overrides.process != null) {
@@ -50,7 +50,7 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     } else {
       process = (name != null) && shouldProcessPotentialComponent(path, name, state);
     }
-    
+
     return {
       name: (overrides && overrides.name) || name || '',
       process,
