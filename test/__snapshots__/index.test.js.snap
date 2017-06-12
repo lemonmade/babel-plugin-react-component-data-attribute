@@ -177,6 +177,30 @@ exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents add
 }"
 `;
 
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 4`] = `
+"function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}
+
+export default MyComponent;"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 5`] = `
+"function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}
+
+export default doSomethingTo(MyComponent);"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents adds attributes to components that are "root" ones 6`] = `
+"function MyComponent() {
+  return <div data-component=\\"MyComponent\\" />;
+}
+
+export { MyComponent };"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents does not add data attributes to other components 1`] = `
 "function SomeComponent() {
   return <div />;

@@ -255,6 +255,30 @@ describe('babelPluginReactComponentDataAttribute()', () => {
             return <div />;
           }
         `, {onlyRootComponents: true}, {filename: resolve('MyComponent/MyComponent.js')})).toMatchSnapshot();
+
+        expect(transform(`
+          function MyComponent() {
+            return <div />;
+          }
+
+          export default MyComponent;
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/MyComponent.js')})).toMatchSnapshot();
+
+        expect(transform(`
+          function MyComponent() {
+            return <div />;
+          }
+
+          export default doSomethingTo(MyComponent);
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/MyComponent.js')})).toMatchSnapshot();
+
+        expect(transform(`
+          function MyComponent() {
+            return <div />;
+          }
+
+          export {MyComponent};
+        `, {onlyRootComponents: true}, {filename: resolve('MyComponent/MyComponent.js')})).toMatchSnapshot();
       });
 
       it('does not add data attributes to other components', () => {

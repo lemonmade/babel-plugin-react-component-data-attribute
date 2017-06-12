@@ -20,7 +20,34 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     };
   }
 
-  function shouldProcessPossibleComponent(path, state) {
+  function isExported(path, name) {
+    if (
+      path.parentPath.isExportDefaultDeclaration() ||
+      path.parentPath.isExportNamedDeclaration()
+    ) { return true; }
+
+    const binding = path.scope.getBinding(name);
+
+    return binding
+      ? binding.referencePaths.some((referencePath) => (
+        referencePath.getAncestry().some((ancestorPath) => (
+          ancestorPath.isExportDefaultDeclaration() ||
+          ancestorPath.isExportSpecifier() ||
+          ancestorPath.isExportNamedDeclaration()
+        ))
+      ))
+      : false;
+  }
+
+  function evaluatePotentialComponent(path, state) {
+    const name = nameForReactComponent(path, state.file);
+    return {
+      name: name || '',
+      process: name != null && shouldProcessPotentialComponent(path, name, state),
+    };
+  }
+
+  function shouldProcessPotentialComponent(path, name, state) {
     if (!path.getFunctionParent().isProgram()) { return false; }
     if (path.parentPath.isAssignmentExpression()) { return false; }
 
@@ -31,8 +58,7 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     if (details == null) { return false; }
     if (details.name !== 'index' && details.name !== details.directory) { return false; }
 
-    const statementParent = path.getStatementParent();
-    return statementParent.isExportDefaultDeclaration() || statementParent.isExportNamedDeclaration();
+    return isExported(path, name);
   }
 
   function nameForReactComponent(path, file) {
@@ -98,7 +124,7 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     },
   };
 
-  const renderMethodVisitor = {
+  const functionVisitor = {
     ReturnStatement(path, {name, source}) {
       const arg = path.get('argument');
 
@@ -112,33 +138,35 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
     },
   };
 
+  const programVisitor = {
+    'ClassDeclaration|ClassExpression': (path, state) => {
+      const {name, process} = evaluatePotentialComponent(path, state);
+      if (!process) { return; }
+
+      path
+        .get('body.body')
+        .filter((bodyPath) => bodyPath.isClassMethod() && bodyPath.get('key').isIdentifier({name: 'render'}))
+        .forEach((renderPath) => {
+          renderPath.traverse(functionVisitor, {name, source: renderPath});
+        });
+    },
+    'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression': (path, state) => {
+      const {name, process} = evaluatePotentialComponent(path, state);
+      if (!process) { return; }
+
+      if (path.isArrowFunctionExpression() && !path.get('body').isBlockStatement()) {
+        path.traverse(returnStatementVisitor, {name, source: path});
+      } else {
+        path.traverse(functionVisitor, {name, source: path});
+      }
+    },
+  };
+
   return {
     name: 'babel-plugin-react-component-data-attribute',
     visitor: {
-      'ClassDeclaration|ClassExpression': (path, state) => {
-        if (!shouldProcessPossibleComponent(path, state)) { return; }
-
-        const name = nameForReactComponent(path, state.file);
-        if (name == null) { return; }
-
-        path
-          .get('body.body')
-          .filter((bodyPath) => bodyPath.isClassMethod() && bodyPath.get('key').isIdentifier({name: 'render'}))
-          .forEach((renderPath) => {
-            renderPath.traverse(renderMethodVisitor, {name, source: renderPath});
-          });
-      },
-      'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression': (path, state) => {
-        if (!shouldProcessPossibleComponent(path, state)) { return; }
-
-        const name = nameForReactComponent(path, state.file);
-        if (name == null) { return; }
-
-        if (path.isArrowFunctionExpression() && !path.get('body').isBlockStatement()) {
-          path.traverse(returnStatementVisitor, {name, source: path});
-        } else {
-          path.traverse(renderMethodVisitor, {name, source: path});
-        }
+      Program(path, state) {
+        path.traverse(programVisitor, state);
       },
     },
   };
