@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`babelPluginReactComponentDataAttribute() adds the attribute to the first non-composite component 1`] = `
+"function MyComponent() {
+  return <SomeOtherComponent><div data-component=\\"MyComponent\\"><div /></div></SomeOtherComponent>;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() adds the attribute to the first non-composite component 2`] = `
+"function MyComponent() {
+  return <SomeOtherComponent>{() => <div><div /></div>}</SomeOtherComponent>;
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() adds the property to React.createElement calls 1`] = `
 "function MyComponent() {
   return React.createElement(someElement, { foo: 'bar', 'data-component': 'MyComponent'
@@ -28,6 +40,12 @@ exports[`babelPluginReactComponentDataAttribute() classes only adds attributes t
 exports[`babelPluginReactComponentDataAttribute() does not add attributes from a parent function 1`] = `
 "function MyComponent() {
   return () => <div />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() does not add attributes to JSX elements in props 1`] = `
+"function MyComponent() {
+  return <SomeOtherComponent someProp={<div />}><div data-component=\\"MyComponent\\" /></SomeOtherComponent>;
 }"
 `;
 
@@ -128,18 +146,6 @@ exports[`babelPluginReactComponentDataAttribute() name uses the variable name wh
 exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the top-level node 1`] = `
 "function MyComponent() {
   return <div data-component=\\"MyComponent\\"><div /></div>;
-}"
-`;
-
-exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the top-level node 2`] = `
-"function MyComponent() {
-  return <SomeOtherComponent><div /></SomeOtherComponent>;
-}"
-`;
-
-exports[`babelPluginReactComponentDataAttribute() only adds the attribute to the top-level node 3`] = `
-"function MyComponent() {
-  return <SomeOtherComponent>{() => <div />}</SomeOtherComponent>;
 }"
 `;
 

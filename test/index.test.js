@@ -19,6 +19,30 @@ describe('babelPluginReactComponentDataAttribute()', () => {
     `)).toMatchSnapshot();
   });
 
+  it('adds the attribute to the first non-composite component', () => {
+    expect(transform(`
+      function MyComponent() {
+        return <SomeOtherComponent><div><div /></div></SomeOtherComponent>;
+      }
+    `)).toMatchSnapshot();
+
+    expect(transform(`
+      function MyComponent() {
+        return (
+          <SomeOtherComponent>{() => <div><div /></div>}</SomeOtherComponent>
+        );
+      }
+    `)).toMatchSnapshot();
+  });
+
+  it('does not add attributes to JSX elements in props', () => {
+    expect(transform(`
+      function MyComponent() {
+        return <SomeOtherComponent someProp={<div />}><div /></SomeOtherComponent>;
+      }
+    `)).toMatchSnapshot();
+  });
+
   it('handles conditional returns', () => {
     expect(transform(`
       function MyComponent() {
@@ -44,22 +68,6 @@ describe('babelPluginReactComponentDataAttribute()', () => {
       function MyComponent() {
         return (
           <div><div /></div>
-        );
-      }
-    `)).toMatchSnapshot();
-
-    expect(transform(`
-      function MyComponent() {
-        return (
-          <SomeOtherComponent><div /></SomeOtherComponent>
-        );
-      }
-    `)).toMatchSnapshot();
-
-    expect(transform(`
-      function MyComponent() {
-        return (
-          <SomeOtherComponent>{() => <div />}</SomeOtherComponent>
         );
       }
     `)).toMatchSnapshot();

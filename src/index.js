@@ -82,15 +82,18 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
 
   const returnStatementVisitor = {
     JSXElement(path, {name, source}) {
-      // We never want to go into a tree of JSX elements, only ever process the top-level item
-      path.skip();
-
       // Bail early if we are in a different function than the component
       if (path.getFunctionParent() !== source) { return; }
 
       const openingElement = path.get('openingElement');
       const {node} = openingElement;
       if (!t.isJSXIdentifier(node.name) || !BUILTIN_COMPONENT_REGEX.test(node.name.name)) { return; }
+
+      // We never want to go into a tree of JSX elements, only ever process the top-level item
+      path.skip();
+
+      // If we are in a regular prop (not children, bail out)
+      if (path.parentPath.isJSXExpressionContainer()) { return; }
 
       const hasDataAttribute = node.attributes.some((attribute) => (
         t.isJSXIdentifier(attribute.name, {name: DATA_ATTRIBUTE})
