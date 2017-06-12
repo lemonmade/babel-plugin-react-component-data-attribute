@@ -303,6 +303,84 @@ describe('babelPluginReactComponentDataAttribute()', () => {
         `, {onlyRootComponents: true}, {filename: resolve('MyComponent/SomethingElse.js')})).toMatchSnapshot();
       });
     });
+
+    describe('overrides', () => {
+      describe('process', () => {
+        it('does not process a component when it would have otherwise', () => {
+          expect(transform(`
+            export default function MyComponent() {
+              return <div />;
+            }
+          `, {
+            onlyRootComponents: true,
+            overrides: {
+              MyComponent: {process: false},
+            },
+          }, {
+            filename: resolve('MyComponent/index.js'),
+          })).toMatchSnapshot();
+        });
+
+        it('processes a component when it would not have otherwise', () => {
+          expect(transform(`
+            export default function MyNestedComponent() {
+              return <div />;
+            }
+          `, {
+            onlyRootComponents: true,
+            overrides: {
+              MyNestedComponent: {process: true},
+            },
+          }, {
+            filename: resolve('MyComponent/MyNestedComponent.js'),
+          })).toMatchSnapshot();
+        });
+      });
+
+      describe('methods', () => {
+        it('processes return statements in the specified methods', () => {
+          expect(transform(`
+            export default class MyComponent extends React.Component {
+              renderLayer() {
+                return <div />;
+              }
+
+              renderSomethingElse() {
+                return <div />;
+              }
+
+              render() {
+                return <div />;
+              }
+            }
+          `, {
+            overrides: {
+              MyComponent: {
+                methods: ['renderLayer', 'renderSomethingElse'],
+              },
+            },
+          })).toMatchSnapshot();
+        });
+      });
+
+      describe('name', () => {
+        it('uses the custom name', () => {
+          expect(transform(`
+            class MyComponent extends React.Component {
+              render() {
+                return <div />;
+              }
+            }
+          `, {
+            overrides: {
+              MyComponent: {
+                name: 'SomeOtherComponent',
+              },
+            },
+          })).toMatchSnapshot();
+        });
+      });
+    });
   });
 });
 

@@ -41,9 +41,20 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
 
   function evaluatePotentialComponent(path, state) {
     const name = nameForReactComponent(path, state.file);
+    const overrides = name && getoverrides(name, state.opts.overrides);
+    
+    let process;
+
+    if (overrides != null && overrides.process != null) {
+      process = overrides.process;
+    } else {
+      process = (name != null) && shouldProcessPotentialComponent(path, name, state);
+    }
+    
     return {
-      name: name || '',
-      process: name != null && shouldProcessPotentialComponent(path, name, state),
+      name: (overrides && overrides.name) || name || '',
+      process,
+      overrides,
     };
   }
 
@@ -143,24 +154,33 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
 
   const programVisitor = {
     'ClassDeclaration|ClassExpression': (path, state) => {
-      const {name, process} = evaluatePotentialComponent(path, state);
+      const {name, process, overrides} = evaluatePotentialComponent(path, state);
       if (!process) { return; }
 
       path
         .get('body.body')
-        .filter((bodyPath) => bodyPath.isClassMethod() && bodyPath.get('key').isIdentifier({name: 'render'}))
+        .filter((bodyPath) => {
+          const {key} = bodyPath.node;
+
+          return (
+            bodyPath.isClassMethod() &&
+            t.isIdentifier(key) &&
+            !key.computed &&
+            overrides.methods.includes(key.name)
+          );
+        })
         .forEach((renderPath) => {
-          renderPath.traverse(functionVisitor, {name, source: renderPath});
+          renderPath.traverse(functionVisitor, {name, source: renderPath, overrides});
         });
     },
     'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression': (path, state) => {
-      const {name, process} = evaluatePotentialComponent(path, state);
+      const {name, process, overrides} = evaluatePotentialComponent(path, state);
       if (!process) { return; }
 
       if (path.isArrowFunctionExpression() && !path.get('body').isBlockStatement()) {
-        path.traverse(returnStatementVisitor, {name, source: path});
+        path.traverse(returnStatementVisitor, {name, source: path, overrides});
       } else {
-        path.traverse(functionVisitor, {name, source: path});
+        path.traverse(functionVisitor, {name, source: path, overrides});
       }
     },
   };
@@ -172,5 +192,14 @@ export default function babelPluginReactComponentDataAttribute({types: t}) {
         path.traverse(programVisitor, state);
       },
     },
+  };
+}
+
+function getoverrides(component, overrides = {}) {
+  const overide = overrides.hasOwnProperty(component) ? overrides[component] : {};
+  return {
+    name: overide.name || component,
+    process: overide.process,
+    methods: overide.methods || ['render'],
   };
 }

@@ -219,6 +219,42 @@ exports[`babelPluginReactComponentDataAttribute() options onlyRootComponents doe
 }"
 `;
 
+exports[`babelPluginReactComponentDataAttribute() options overrides methods processes return statements in the specified methods 1`] = `
+"export default class MyComponent extends React.Component {
+  renderLayer() {
+    return <div data-component=\\"MyComponent\\" />;
+  }
+
+  renderSomethingElse() {
+    return <div data-component=\\"MyComponent\\" />;
+  }
+
+  render() {
+    return <div />;
+  }
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options overrides name uses the custom name 1`] = `
+"class MyComponent extends React.Component {
+  render() {
+    return <div data-component=\\"SomeOtherComponent\\" />;
+  }
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options overrides process does not process a component when it would have otherwise 1`] = `
+"export default function MyComponent() {
+  return <div />;
+}"
+`;
+
+exports[`babelPluginReactComponentDataAttribute() options overrides process processes a component when it would not have otherwise 1`] = `
+"export default function MyNestedComponent() {
+  return <div data-component=\\"MyNestedComponent\\" />;
+}"
+`;
+
 exports[`babelPluginReactComponentDataAttribute() updates intermediate assignments as appropriate 1`] = `
 "function MyComponent() {
   const markup = <div data-component=\\"MyComponent\\" />;
