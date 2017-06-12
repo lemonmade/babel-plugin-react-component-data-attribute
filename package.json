@@ -1,7 +1,7 @@
 {
   "name": "babel-plugin-react-component-data-attribute",
   "description": "Babel plugin to add a data attribute containing its component’s name to the top-level DOM node",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "main": "lib/index.js",
   "author": "Chris Sauve <chrismsauve@gmail.com>",
   "license": "MIT",
